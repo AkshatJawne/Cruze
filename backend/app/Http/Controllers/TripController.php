@@ -20,11 +20,15 @@ class TripController extends Controller
             'destination_name' => 'required',
         ]); 
 
-        return $request->user()->trips()->create($request->only([
+        $trip = $request->user()->trips()->create($request->only([
             'origin', 
             'destination', 
             'destination_name',
         ]));
+
+        TripCreated::dispatch($trip, $trip->user);
+
+        return $trip;
     }
 
     public function show(Request $request, Trip $trip) {
@@ -103,7 +107,7 @@ class TripController extends Controller
 
         $trip->load('driver.user'); 
 
-        TripLocationUpdated::dispatch($trip, $request->user());
+        TripLocationUpdated::dispatch($trip, $trip->user);
 
         return $trip; 
     }

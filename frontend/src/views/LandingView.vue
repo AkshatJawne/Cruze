@@ -21,9 +21,26 @@
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router';
+import { useRouter } from 'vue-router'
+import http from '@/helpers/http'
 
-const router = useRouter();
+const router = useRouter()
+
+const handleStartDriving = () => {
+    http().get(`/api/driver`).then((response) => {
+        if (response.data.driver) {
+            router.push({
+                name: 'standby'
+            })
+        } else {
+            router.push({
+                name: 'driver'
+            })
+        }
+    }).catch((error)=> {
+        console.error(error)
+    })
+}
 
 const handleFindARide = () => {
     router.push({

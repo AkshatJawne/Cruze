@@ -28,19 +28,20 @@
 
 <script setup>
 import { useLocationStore } from '@/stores/location'
+import { useTripStore } from '@/stores/trip'
 import { onMounted } from 'vue';
 import { useRouter } from 'vue-router'
 import { ref } from 'vue'
 import http from '@/helpers/http'
 
 const location = useLocationStore()
+const trip = useTripStore()
 
 const router = useRouter()
 
 const gMap = ref(null)
 
 onMounted(async () => {
-    // does the user have a location set?
     if (location.destination.name === '') {
         router.push({
             name: 'location'
@@ -52,7 +53,7 @@ onMounted(async () => {
 
     // draw a path on the map from current location to destination
     gMap.value.$mapPromise.then((mapObject) => {
-        let currentPoint = new google.maps.LatLng(location.current.geometry),
+        let currentPoint = new google.maps.LatLng(location.origin.geometry),
             destinationPoint = new google.maps.LatLng(location.destination.geometry),
             directionsService = new google.maps.DirectionsService,
             directionsDisplay = new google.maps.DirectionsRenderer({
@@ -80,6 +81,7 @@ const handleConfirmTrip = () => {
         destination: location.destination.geometry, 
         destinationName: location.destination.name 
     }).then((response) => {
+        trip.$patch(response.data)
         router.push({
             name: 'trip'
         })
